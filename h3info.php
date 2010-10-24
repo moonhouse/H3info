@@ -62,9 +62,11 @@ if (!class_exists('H3info')) {
 
         function insertFootNote($content) {
             //todo: work with links in other languages than English
-            preg_match("/http:\/\/([a-z]*)\.wikipedia\.org\/wiki\/([^\"]*)/", $content, $matches);
-            $id = $matches[2];
-            $content .= $this->test($id);
+            if(preg_match("/http:\/\/([a-z]*)\.wikipedia\.org\/wiki\/([^\"]*)/", $content, $matches)) {
+	            $id = $matches[2];
+	            $content .= $this->test($id);
+            
+            }
             return $content;
         }
 
