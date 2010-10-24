@@ -108,8 +108,7 @@ if (!class_exists('H3info')) {
 
         function lookup($article_id, $lang='en') {
             //todo: follow redirects
-
-            if (false === ($infoboxes = get_transient("h3:$article_id:$lang"))) {
+            if (false === ($infoboxes = get_transient("h3a:$article_id:$lang"))) {
 
                 $ch = curl_init();
 
@@ -123,26 +122,25 @@ if (!class_exists('H3info')) {
                 curl_close($ch);
 
                 $json = json_decode($json);
-
                 $infoboxes = '';
-                if($json->{"http://dbpedia.org/resource/$article_id"}->{"http://dbpedia.org/ontology/abstract"}) {
-                    foreach ($json->{"http://dbpedia.org/resource/$article_id"}->{"http://dbpedia.org/ontology/abstract"} as $value) {
-                        if($value->lang == $lang) {
-                            $infoboxes.= $value->value;
+                if(isset($json->{"http://dbpedia.org/resource/$article_id"}->{"http://dbpedia.org/ontology/abstract"})) {
+                foreach ($json->{"http://dbpedia.org/resource/$article_id"}->{"http://dbpedia.org/ontology/abstract"} as $value) {
+                    if($value->lang == $lang) {
+                        $infoboxes.= $value->value;
+                    }
+                }
+                foreach ($json->{"http://dbpedia.org/resource/$article_id"}->{"http://www.w3.org/2000/01/rdf-schema#label"} as $value) {
+                    if($value->lang == $lang) {
+                        $infoboxes.= "<br/><em>Information from Wikipedia/DBpedia, <a href=\"http://dbpedia.org/resource/$article_id\">article</a></em>";
+                        if($infoboxes!='') {
+                            $infoboxes ='<div class="h3-infobox">'.$infoboxes.'</div>';
                         }
                     }
-                    foreach ($json->{"http://dbpedia.org/resource/$article_id"}->{"http://www.w3.org/2000/01/rdf-schema#label"} as $value) {
-                        if($value->lang == $lang) {
-                            $infoboxes.= "<br/><em>Information from Wikipedia/DBpedia, <a href=\"http://dbpedia.org/resource/$article_id\">article</a></em>";
-                            if($infoboxes!='') {
-                                $infoboxes ='<div class="h3-infobox">'.$infoboxes.'</div>';
-                            }
-                        }
-                    }
-
+                }
+                
 
                 }
-
+                                
                 set_transient("h3:$article_id:$lang", $infoboxes, 60*60*$this->o['cachetime']);
             }
             return $infoboxes;
@@ -150,9 +148,11 @@ if (!class_exists('H3info')) {
 
         function insertFootNote($content) {
             //todo: work with links in other languages than English
-            if(preg_match("/http:\/\/([a-z]*)\.wikipedia\.org\/wiki\/([^\"]*)/", $content, $matches)) {
-                $id = $matches[2];
-                $content .= $this->lookup($id, $this->o["language"]);
+            if(preg_match_all("/http:\/\/([a-z]*)\.wikipedia\.org\/wiki\/([^\"]*)/", $content, $matches)) {
+                $ids = $matches[2];
+                foreach($ids as $id) {
+	               $content .= $this->lookup($id, $this->o["language"]);
+                }
 
             }
             return $content;
