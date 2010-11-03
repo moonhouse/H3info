@@ -3,8 +3,8 @@
 Plugin Name: H3info
 Plugin URI: http://www.moonhouse.se/posts/h3info
 Description: Explanatory info from Wikipedia
-Author: David Hall
-Version: 0.0.4
+Author: David Hall (based on an idea by Heidi Harman)
+Version: 0.0.5
 Author URI: http://www.dpg.se
 */
 
