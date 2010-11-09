@@ -2,3 +2,6 @@ h1. H3info
 
 H3info is a Wordpress plugin that automatically fetches excerpts of Wikipedia articles from DBpedia when such articles are linked from within a blogpost.
 
+h2. Styling
+
+To style the infobox you can override the h3-infobox CSS class.

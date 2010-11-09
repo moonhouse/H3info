@@ -4,7 +4,7 @@ Plugin Name: H3info
 Plugin URI: http://www.moonhouse.se/posts/h3info
 Description: Explanatory info from Wikipedia
 Author: David Hall (based on an idea by Heidi Harman)
-Version: 0.0.5
+Version: 0.0.6
 Author URI: http://www.dpg.se
 */
 
@@ -18,7 +18,8 @@ if (!class_exists('H3info')) {
         var $default_options = array(
             'cachetime' => 12,
             'language' => 'en',
-            'revision' => 1);
+            'excerptlength' => 140,
+            'revision' => 2);
 
         var $o = array();
 
@@ -74,6 +75,9 @@ if (!class_exists('H3info')) {
                 'dpgse_hthreeinfo','cachetime');
             add_settings_field('dpgse_hthreeinfo_field_2', 'Language (2 chars)', array ( &$this, 'field_display'), 'hthreeinfo',
                 'dpgse_hthreeinfo','language');
+                add_settings_field('dpgse_hthreeinfo_field_3', 'Excerpt length (chars)', array ( &$this, 'field_display'), 'hthreeinfo',
+                'dpgse_hthreeinfo','excerptlength');
+
 
         }
 
@@ -87,6 +91,10 @@ if (!class_exists('H3info')) {
                     echo "<input id='dpgse_hthreeinfo_field' name='dpgse_hthreeinfo_options[language]' size='20' type='text'";
                     echo "value='{$this->o['language']}' />";
                     break;
+                case "excerptlength":
+                    echo "<input id='dpgse_hthreeinfo_field' name='dpgse_hthreeinfo_options[excerptlength]' size='5' type='text'";
+                    echo "value='{$this->o['excerptlength']}' />";
+                    break;
             }
 
         }
@@ -95,6 +103,7 @@ if (!class_exists('H3info')) {
             preg_match("/[a-z]{2,2}/", $input['language'], $matches);
             $newinput['language'] = $matches[0];
             $newinput['cachetime'] = intval($input['cachetime']);
+            $newinput['excerptlength'] = intval($input['excerptlength']);
             return $newinput;
         }
 
@@ -104,6 +113,7 @@ if (!class_exists('H3info')) {
             register_activation_hook(__FILE__, array ( &$this, 'install_plugin' ));
             add_action('admin_init', array ( &$this, 'admin_init' ));
             add_action('admin_menu', array ( &$this, 'settings_menu' ));
+            wp_enqueue_style('h3info',plugins_url( 'h3info' ).'/style.css', false, $this->o['revision']);
         }
 
         function lookup($article_id, $lang='en') {
@@ -131,8 +141,10 @@ if (!class_exists('H3info')) {
                 }
                 foreach ($json->{"http://dbpedia.org/resource/$article_id"}->{"http://www.w3.org/2000/01/rdf-schema#label"} as $value) {
                     if($value->lang == $lang) {
-                        $infoboxes.= "<br/><em>Information from Wikipedia/DBpedia, <a href=\"http://dbpedia.org/resource/$article_id\">article</a></em>";
                         if($infoboxes!='') {
+                        	if(strlen($infoboxes) > $this->o["excerptlength"])
+                        		$infoboxes = substr($infoboxes, 0, $this->o["excerptlength"]).'&#8230';
+                        	$infoboxes.= "<br/><em>Information from Wikipedia/DBpedia, <a href=\"http://dbpedia.org/resource/$article_id\">article</a></em>";
                             $infoboxes ='<div class="h3-infobox">'.$infoboxes.'</div>';
                         }
                     }
