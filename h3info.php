@@ -4,7 +4,7 @@ Plugin Name: H3info
 Plugin URI: http://www.moonhouse.se/posts/h3info
 Description: Explanatory info from Wikipedia
 Author: David Hall (based on an idea by Heidi Harman)
-Version: 0.0.6
+Version: 0.0.6a
 Author URI: http://www.dpg.se
 */
 
@@ -18,7 +18,7 @@ if (!class_exists('H3info')) {
         var $default_options = array(
             'cachetime' => 12,
             'language' => 'en',
-            'excerptlength' => 140,
+            'excerptlength' => 350,
             'revision' => 2);
 
         var $o = array();
