@@ -4,7 +4,7 @@ Plugin Name: H3info
 Plugin URI: http://www.moonhouse.se/posts/h3info
 Description: Explanatory info from Wikipedia
 Author: David Hall (based on an idea by Heidi Harman)
-Version: 0.0.6a
+Version: 0.0.6b
 Author URI: http://www.dpg.se
 */
 
@@ -118,7 +118,7 @@ if (!class_exists('H3info')) {
 
         function lookup($article_id, $lang='en') {
             //todo: follow redirects
-            if (false === ($infoboxes = get_transient("h3a:$article_id:$lang"))) {
+            if (false === ($infoboxes = get_transient("h3:$article_id:$lang"))) {
 
                 $ch = curl_init();
 
